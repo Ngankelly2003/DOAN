@@ -62,7 +62,7 @@ export const RSS_SOURCES_Sport = {
   NGUOIDUATIN: "https://www.nguoiduatin.vn/rss/the-thao.rss",
 };
 
-export const SERVER_API_URL = "https://graduation-be-vlen.onrender.com";
+export const SERVER_API_URL = "https://be-doan-be56.onrender.com/";
 export enum KEYS_STORAGE {
   USER_TOKEN = "user-token",
 }
