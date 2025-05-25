@@ -97,7 +97,7 @@ export default function NewsEvent({ type, lang }: NewsEventProps) {
   const paginatedArticles = useMemo(() => {
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    return processedNews.slice(startIndex, endIndex);
+    return processedNews?.slice(startIndex, endIndex);
   }, [page, pageSize, processedNews]);
 
   const mappingPostTitle: { [key in TypePage]: string } = {
@@ -151,7 +151,7 @@ export default function NewsEvent({ type, lang }: NewsEventProps) {
 
       <Row gutter={[16, 16]} style={{ margin: "20px 0" }}>
         <Col xs={24} lg={16}>
-          {paginatedArticles.map((ele: Item, index: number) => (
+          {paginatedArticles?.map((ele: Item, index: number) => (
             <div key={index} style={{ marginBottom: "16px" }}>
               <CardItem horizontalLines={false} data={ele as any} />
             </div>
