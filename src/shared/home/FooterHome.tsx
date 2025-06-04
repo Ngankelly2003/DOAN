@@ -38,8 +38,8 @@ const FooterHome = () => {
           )}
         </div>
       )}
-      <Footer style={{ textAlign: "center" }}>
-        Design ©{new Date().getFullYear()} Created by DinhTuan
+    <Footer style={{ textAlign: "center" }}>  
+        Design ©{new Date().getFullYear()} Created by 2021604905
       </Footer>
     </Layout>
   );

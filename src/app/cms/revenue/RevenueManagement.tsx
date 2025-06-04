@@ -95,7 +95,7 @@ const RevenueManagement = () => {
       key: "advertisingFields",
       render: (
         fields: { advertisingFieldId: number; advertisingFieldName: string }[]
-      ) => fields.map((field) => field.advertisingFieldName).join(", "),
+      ) => fields?.map((field) => field?.advertisingFieldName).join(", "),
     },
     {
       title: "Action",
@@ -119,7 +119,7 @@ const RevenueManagement = () => {
       ...record,
       timeRange: [dayjs(record.startDate), dayjs(record.endDate)],
       advertisingFields: record.advertisingFields.map(
-        (field) => field.advertisingFieldId
+        (field) => field?.advertisingFieldId
       ),
     });
     try {
