@@ -46,5 +46,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 }
 
 export const config = {
-  matcher: ["/api/rss/:path*"],
+  matcher: ["/api/rss/:path*","/api/chat/:path*","/api/chat"],
 };
