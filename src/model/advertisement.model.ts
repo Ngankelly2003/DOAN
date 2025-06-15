@@ -21,6 +21,6 @@ export interface INewAdvertisement {
 }
 export interface IAdvertisement extends INewAdvertisement {
   advertisementId: number;
-  startTime: string;
-  endTime: string;
+  startDate: string;
+  endDate: string;
 }

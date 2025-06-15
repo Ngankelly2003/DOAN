@@ -80,11 +80,11 @@ const { actions, reducer } = createSlice({
   extraReducers: (builder) => {
     builder.addCase(
       getAdvertiments.fulfilled,
-      (state, { payload }: PayloadAction<IResponse<IAdvertisement[]>>) => {
+      (state, { payload }: PayloadAction<IResponse<any>>) => {
         console.log("Got advertisements data:", payload.data);
         
         // Xử lý dữ liệu trước khi lưu vào store
-        const processedData = payload.data.map(ad => {
+        const processedData = payload.data.map((ad:any) => {
           // Tạo bản sao của quảng cáo
           const processedAd = { ...ad };
           
@@ -103,8 +103,8 @@ const { actions, reducer } = createSlice({
             if (Array.isArray(processedAd.advertisingFields) && processedAd.advertisingFields.length > 0) {
               // Tạo advertisingFieldIds từ advertisingFields
               processedAd.advertisingFieldIds = processedAd.advertisingFields
-                .filter(field => field && field.advertisingFieldId)
-                .map(field => field.advertisingFieldId);
+                .filter((field:any) => field && field.advertisingFieldId)
+                .map((field:any) => field.advertisingFieldId);
             } else {
               processedAd.advertisingFieldIds = [];
             }
@@ -115,12 +115,12 @@ const { actions, reducer } = createSlice({
             // Tạo một Set các ID hiện có trong advertisingFields
             const existingFieldIds = new Set(
               processedAd.advertisingFields
-                .filter(field => field && field.advertisingFieldId)
-                .map(field => field.advertisingFieldId)
+                .filter((field:any) => field && field.advertisingFieldId)
+                .map((field:any) => field.advertisingFieldId)
             );
             
             // Thêm các field còn thiếu vào advertisingFields
-            processedAd.advertisingFieldIds.forEach(id => {
+            processedAd.advertisingFieldIds.forEach((id:any) => {
               if (!existingFieldIds.has(id)) {
                 processedAd.advertisingFields.push({
                   advertisingFieldId: id,
@@ -149,11 +149,11 @@ const { actions, reducer } = createSlice({
 
     builder.addCase(
       getAdvertimentByUser.fulfilled,
-      (state, { payload }: PayloadAction<IResponse<IAdvertisement[]>>) => {
+      (state, { payload }: PayloadAction<IResponse<any>>) => {
         console.log("Got user advertisements data:", payload.data);
         
         // Xử lý dữ liệu trước khi lưu vào store
-        const processedData = payload.data.map(ad => {
+        const processedData = payload.data.map((ad:any) => {
           // Tạo bản sao của quảng cáo
           const processedAd = { ...ad };
           
@@ -172,8 +172,8 @@ const { actions, reducer } = createSlice({
             if (Array.isArray(processedAd.advertisingFields) && processedAd.advertisingFields.length > 0) {
               // Tạo advertisingFieldIds từ advertisingFields
               processedAd.advertisingFieldIds = processedAd.advertisingFields
-                .filter(field => field && field.advertisingFieldId)
-                .map(field => field.advertisingFieldId);
+                .filter((field:any) => field && field.advertisingFieldId)
+                .map((field:any) => field.advertisingFieldId);
             } else {
               processedAd.advertisingFieldIds = [];
             }
@@ -184,12 +184,12 @@ const { actions, reducer } = createSlice({
             // Tạo một Set các ID hiện có trong advertisingFields
             const existingFieldIds = new Set(
               processedAd.advertisingFields
-                .filter(field => field && field.advertisingFieldId)
-                .map(field => field.advertisingFieldId)
+                .filter((field:any) => field && field.advertisingFieldId)
+                .map((field:any) => field.advertisingFieldId)
             );
             
             // Thêm các field còn thiếu vào advertisingFields
-            processedAd.advertisingFieldIds.forEach(id => {
+            processedAd.advertisingFieldIds.forEach((id:any) => {
               if (!existingFieldIds.has(id)) {
                 processedAd.advertisingFields.push({
                   advertisingFieldId: id,

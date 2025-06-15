@@ -117,7 +117,7 @@ const RevenueManagement = () => {
     setEditingAdId(record.advertisementId);
     form.setFieldsValue({
       ...record,
-      timeRange: [dayjs(record.startTime), dayjs(record.endTime)],
+      timeRange: [dayjs(record.startDate), dayjs(record.endDate)],
       advertisingFields: record.advertisingFields.map(
         (field) => field?.advertisingFieldId
       ),
