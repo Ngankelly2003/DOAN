@@ -94,6 +94,7 @@ const Dashboard: React.FC = () => {
   const users = useSelector(userSelectors.selectAll);
   const advertiments = useSelector(advertisementSelectors.selectAll);
   const [revenues, setRevenues] = useState<IRevenue[]>([]);
+  const [error, setError] = useState<string | null>(null);
   console.log(advertiments);
 
   useEffect(() => {
@@ -103,8 +104,18 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await axiosInstance.get("/revenue");
-      setRevenues(response.data?.data);
+      try {
+        const response = await axiosInstance.get("/revenue");
+        setRevenues(response.data?.data);
+        setError(null);
+      } catch (err: any) {
+        if (err?.response?.status === 401) {
+          setError("Bạn cần đăng nhập để xem thông tin doanh thu");
+        } else {
+          setError("Có lỗi xảy ra khi tải dữ liệu doanh thu");
+        }
+        console.error("Error fetching revenue:", err);
+      }
     })();
   }, []);
   return (
@@ -136,12 +147,16 @@ const Dashboard: React.FC = () => {
         </Col>
         <Col span={6}>
           <Card>
-            <Statistic
-              title="Doanh thu"
-              value={calculateTotalRevenue(revenues)}
-              prefix={<DollarOutlined />}
-              valueStyle={{ color: "#3f8600" }}
-            />
+            {error ? (
+              <div style={{ color: "#cf1322" }}>{error}</div>
+            ) : (
+              <Statistic
+                title="Doanh thu"
+                value={calculateTotalRevenue(revenues)}
+                prefix={<DollarOutlined />}
+                valueStyle={{ color: "#3f8600" }}
+              />
+            )}
           </Card>
         </Col>
         <Col span={6}>

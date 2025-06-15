@@ -26,7 +26,7 @@ const CustomImage = ({
   const paddingTop = (+vertical / +horizontal) * 100;
 
   useEffect(() => {
-    if (!src) {
+    if (!src || src === "") {
       setEmptyImage(true);
     } else {
       setImageError(false);
@@ -41,7 +41,11 @@ const CustomImage = ({
 
   const getImageSrc = (src: string | StaticImageData): string => {
     if (typeof src === "string") {
-      return src;
+      // Check if the URL is valid
+      if (src.startsWith('http://') || src.startsWith('https://')) {
+        return src;
+      }
+      return emptyImg.src;
     }
     return src.src;
   };
@@ -52,9 +56,7 @@ const CustomImage = ({
       className="relative overflow-hidden"
     >
       <img
-        src={
-          !imageError && !emptyImage ? getImageSrc(src) : getImageSrc(emptyImg)
-        }
+        src={getImageSrc(!imageError && !emptyImage ? src : emptyImg)}
         alt={alt}
         onClick={onClick}
         onError={handleImageError}

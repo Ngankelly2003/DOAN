@@ -4,10 +4,12 @@ export enum Status {
 }
 export interface INewAdvertisement {
   advertisementName: string;
+  advertisementEmail: string;  // For contact email
+  advertisementImageUrl: string;  // For the actual image URL
   advertisementLink: string;
   advertisementPosition: string;
-  startDate: string;
-  endDate: string;
+  startTime: string;
+  endTime: string;
   price: number;
   status: Status;
   advertisingFields: [
@@ -19,4 +21,6 @@ export interface INewAdvertisement {
 }
 export interface IAdvertisement extends INewAdvertisement {
   advertisementId: number;
+  startTime: string;
+  endTime: string;
 }

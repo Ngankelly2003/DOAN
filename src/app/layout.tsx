@@ -10,6 +10,7 @@ import { AuthProvider } from "./(provider)/AuthProvider";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ErrorBoundary from "antd/es/alert/ErrorBoundary";
+import ChatBot from "@/components/chat/ChatBot";
 
 const inter = Inter({ subsets: ["latin"] });
 config.autoAddCss = false;
@@ -35,6 +36,7 @@ export default function RootLayout({
             <ErrorBoundary>
               <ThemeProvider>
                 <AntdRegistry>{children}</AntdRegistry>
+                <ChatBot />
               </ThemeProvider>
               <ToastContainer />
             </ErrorBoundary>

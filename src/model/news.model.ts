@@ -13,7 +13,18 @@ export interface Item {
   pubDate: string;
 }
 export interface INews {
+  id: string | number;
   title: string;
+  description?: string;
+  content: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+  author?: string;
+  category?: string;
+  url?: string;
+  imageUrl?: string;
+  source?: string;
+  sourceTitle?: string;
   newsId: string;
   image: {
     link: string;
@@ -21,7 +32,6 @@ export interface INews {
     url: string;
   };
   generator: string;
-  description: string;
   items: Item[];
   link: string;
   pubDate: string;

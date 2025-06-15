@@ -46,9 +46,22 @@ import { createPayment } from "@/service/store/vnpay/vnpay.api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/service/config/axios-interceptor";
+import { getAdvertisingFields } from "@/service/store/advertising-field/advertising-field.api";
+import { IAdvertisingField } from "@/model/advertisingField.model";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+
+const ADVERTISING_FIELDS = [
+  { id: 1, name: "Điện tử" },
+  { id: 2, name: "Cơ khí" },
+  { id: 3, name: "Công nghệ thông tin" },
+  { id: 4, name: "Thương mại" },
+  { id: 5, name: "Giáo dục" },
+  { id: 6, name: "Y tế" },
+  { id: 7, name: "Du lịch" },
+  { id: 8, name: "Bất động sản" },
+];
 
 const AdManagement = () => {
   const ads = useSelector(advertisementSelectors.selectAll);
@@ -61,11 +74,26 @@ const AdManagement = () => {
   const [editingAdId, setEditingAdId] = useState<number | null>(null);
   const [requestAdver, setRequestAdver] = useState<number | null>(null);
   const [urlPayment, setUrlPayment] = useState<string>("");
+  const [advertisingFields, setAdvertisingFields] = useState<IAdvertisingField[]>([]);
   const dispatch = useDispatch();
   const router = useRouter();
-  const [paymentStatus, setPaymentStatus] = useState<Record<number, string>>(
-    {}
-  );
+  const [paymentStatus, setPaymentStatus] = useState<Record<number, string>>({});
+  const [transactionRefs, setTransactionRefs] = useState<Record<number, string>>({});
+
+  useEffect(() => {
+    const fetchAdvertisingFields = async () => {
+      try {
+        const response = await dispatch(getAdvertisingFields() as any);
+        if (response.payload) {
+          setAdvertisingFields(response.payload);
+        }
+      } catch (error) {
+        console.error("Error fetching advertising fields:", error);
+        toast.error("Không thể tải danh sách lĩnh vực quảng cáo");
+      }
+    };
+    fetchAdvertisingFields();
+  }, [dispatch]);
 
   useEffect(() => {
     if (urlPayment) {
@@ -105,6 +133,7 @@ const AdManagement = () => {
 
     checkPaymentStatus();
   }, [router]);
+
   useEffect(() => {
     const fetchData = async () => {
       if (user?.roleEntity?.roleCode === "admin") {
@@ -157,6 +186,17 @@ const AdManagement = () => {
     }
   }, [isRequestApproval]);
 
+  useEffect(() => {
+    const savedRefs = localStorage.getItem('transactionRefs');
+    if (savedRefs) {
+      setTransactionRefs(JSON.parse(savedRefs));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('transactionRefs', JSON.stringify(transactionRefs));
+  }, [transactionRefs]);
+
   const columns = [
     {
       title: "STT",
@@ -170,11 +210,21 @@ const AdManagement = () => {
       dataIndex: "advertisementLink",
       key: "advertisementLink",
       render: (_: any, record: IAdvertisement) => {
-        return (
-          <a href={record?.advertisementLink ?? ""} target="_blank">
-            {record.advertisementLink}
-          </a>
-        );
+        const link = record?.advertisementLink ?? "";
+        // Check if the link is an email address
+        if (link.includes('@')) {
+          return <span>{link}</span>;
+        }
+        // Check if the link is a valid URL
+        if (link.startsWith('http://') || link.startsWith('https://')) {
+          return (
+            <a href={link} target="_blank" rel="noopener noreferrer">
+              {link}
+            </a>
+          );
+        }
+        // If not a valid URL, just display the text
+        return <span>{link}</span>;
       },
       width: 100,
       ellipsis: true,
@@ -186,15 +236,15 @@ const AdManagement = () => {
     },
     {
       title: "Start Date",
-      dataIndex: "startDate",
-      key: "startDate",
-      render: (text: string) => dayjs(text).format("YYYY-MM-DD"),
+      dataIndex: "startTime",
+      key: "startTime",
+      render: (text: string) => text ? dayjs(text).format("YYYY-MM-DD") : "",
     },
     {
       title: "End Date",
-      dataIndex: "endDate",
-      key: "endDate",
-      render: (text: string) => dayjs(text).format("YYYY-MM-DD"),
+      dataIndex: "endTime",
+      key: "endTime",
+      render: (text: string) => text ? dayjs(text).format("YYYY-MM-DD") : "",
     },
     {
       title: "Price",
@@ -213,14 +263,35 @@ const AdManagement = () => {
         </Tag>
       ),
     },
-    // {
-    //   title: "Fields",
-    //   dataIndex: "advertisingFields",
-    //   key: "advertisingFields",
-    //   render: (
-    //     fields: { advertisingFieldId: number; advertisingFieldName: string }[]
-    //   ) => fields.map((field) => field?.advertisingFieldName).join(", "),
-    // },
+    {
+      title: "Mã hóa đơn",
+      key: "transactionRef",
+      render: (_: any, record: IAdvertisement) => (
+        <span>{transactionRefs[record.advertisementId] || "-"}</span>
+      ),
+    },
+    ...(user?.roleEntity?.roleCode === "admin"
+      ? [
+          {
+            title: "Fields",
+            dataIndex: "advertisingFields",
+            key: "advertisingFields",
+            render: (fields: any[]) => {
+              if (!fields || !Array.isArray(fields)) return '';
+              return fields
+                .map(field => {
+                  const id = typeof field === 'object' ? field?.advertisingFieldId : field;
+                  const found = advertisingFields.find(f => f.advertisingFieldId === id);
+                  return found
+                    ? found.advertisingFieldName
+                    : (field?.advertisingFieldName || field?.name || '');
+                })
+                .filter(Boolean)
+                .join(", ");
+            },
+          },
+        ]
+      : []),
     {
       title: "Action",
       key: "action",
@@ -262,12 +333,19 @@ const AdManagement = () => {
               </Popconfirm>
             )}
           {user?.roleEntity?.roleCode === "user" &&
-            record.status === Status.APPROVED &&
-            paymentStatus[record.advertisementId] !== "failed" && (
-              <Tooltip title="Thanh toán">
+            record.status === Status.APPROVED && (
+              <Tooltip title={
+                transactionRefs[record.advertisementId]
+                  ? "Đã thanh toán - Không thể thanh toán lại"
+                  : paymentStatus[record.advertisementId] === "failed"
+                  ? "Thanh toán thất bại - Nhấn để thử lại"
+                  : "Thanh toán"
+              }>
                 <Button
                   icon={<CreditCardOutlined />}
                   onClick={() => handlePayment(record)}
+                  danger={paymentStatus[record.advertisementId] === "failed"}
+                  disabled={!!transactionRefs[record.advertisementId]}
                 ></Button>
               </Tooltip>
             )}
@@ -303,8 +381,16 @@ const AdManagement = () => {
             amount: amountInVND,
             orderInfo: `Thanh toán ${record.advertisementName}`,
           }) as any
-        ).then((data: any) => {
-          setUrlPayment(data.payload);
+        ).then((data: { payload: string }) => {
+          const paymentUrl = data.payload;
+          // Extract transaction reference from payment URL
+          const urlParams = new URLSearchParams(paymentUrl.split('?')[1]);
+          const vnp_TxnRef = urlParams.get('vnp_TxnRef');
+          if (vnp_TxnRef) {
+            const newRefs = { ...transactionRefs, [record.advertisementId]: vnp_TxnRef };
+            updateTransactionRefs(newRefs);
+          }
+          setUrlPayment(paymentUrl);
         });
       }
     );
@@ -314,7 +400,7 @@ const AdManagement = () => {
     setEditingAdId(record.advertisementId);
     form.setFieldsValue({
       ...record,
-      timeRange: [dayjs(record.startDate), dayjs(record.endDate)],
+      timeRange: [dayjs(record.startTime), dayjs(record.endTime)],
       advertisingFields: record.advertisingFields.map(
         (field) => field?.advertisingFieldId
       ),
@@ -323,15 +409,7 @@ const AdManagement = () => {
   };
 
   const handleSendApproval = (record: IAdvertisement) => {
-    setRequestAdver(record.advertisementId);
-    form.setFieldsValue({
-      ...record,
-      timeRange: [dayjs(record.startDate), dayjs(record.endDate)],
-      advertisingFields: record?.advertisingFields?.map(
-        (field) => field?.advertisingFieldId
-      ),
-    });
-    setIsModalVisible(true);
+    dispatch(requestApprovalAdvertiment(record.advertisementId) as any);
   };
 
   const handleDelete = (id: number) => {
@@ -340,17 +418,17 @@ const AdManagement = () => {
 
   const handleModalOk = () => {
     form.validateFields().then((values) => {
-      const [startTime, endTime] = values?.timeRange;
+      const [start, end] = values?.timeRange || [];
+      const startDate = start ? dayjs(start).format("YYYY-MM-DD") : null;
+      const endDate = end ? dayjs(end).format("YYYY-MM-DD") : null;
       if (editingAdId === null && requestAdver === null) {
         const newAd: any = {
           advertisementName: values.advertisementName,
           advertisementLink: values.advertisementLink,
           advertisementPosition: values.advertisementPosition,
-          startDate: startTime.format("YYYY-MM-DD"),
-          endDate: endTime.format("YYYY-MM-DD"),
-          advertisingFieldIds: values?.advertisingFields?.map(
-            (id: number) => id
-          ),
+          startDate,
+          endDate,
+          advertisingFieldIds: values?.advertisingFields?.map((id: number) => id),
           price: String(values.price),
           userId: user?.userId,
         };
@@ -362,8 +440,8 @@ const AdManagement = () => {
           advertisementName: values.advertisementName,
           advertisementLink: values.advertisementLink,
           advertisementPosition: values.advertisementPosition,
-          startDate: startTime.format("YYYY-MM-DD"),
-          endDate: endTime.format("YYYY-MM-DD"),
+          startDate,
+          endDate,
           price: String(values.price),
           advertisementId:
             editingAdId ||
@@ -375,6 +453,11 @@ const AdManagement = () => {
       }
       setIsModalVisible(false);
     });
+  };
+
+  const updateTransactionRefs = (newRefs: Record<number, string>) => {
+    setTransactionRefs(newRefs);
+    localStorage.setItem('transactionRefs', JSON.stringify(newRefs));
   };
 
   return (
@@ -462,16 +545,19 @@ const AdManagement = () => {
             <RangePicker />
           </Form.Item>
           <Form.Item name="price" label="Price" rules={[{ required: true }]}>
-            <InputNumber min={0} prefix="vnđ" />
+            <InputNumber min={0} prefix="$" />
           </Form.Item>
           <Form.Item
             name="advertisingFields"
-            label="Advertising Fields"
-            rules={[{ required: true }]}
+            label="Fields"
+            rules={[{ required: true, message: 'Vui lòng chọn ít nhất một lĩnh vực' }]}
           >
-            <Select mode="multiple">
-              <Option value={1}>Dien tu</Option>
-              <Option value={3}>Co khi</Option>
+            <Select mode="multiple" placeholder="Chọn lĩnh vực quảng cáo">
+              {advertisingFields.map(field => (
+                <Option key={field.advertisingFieldId} value={field.advertisingFieldId}>
+                  {field.advertisingFieldName}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
         </Form>

@@ -45,8 +45,10 @@ export const getAdvertimentHome = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const { data } = await axiosInstance.get(`/home/advertisement-approval`);
+      console.log("Advertisement Home API Response:", data);
       return data;
     } catch (error: any) {
+      console.error("Error fetching advertisement home:", error.response?.data || error);
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
@@ -56,9 +58,12 @@ export const createAdvertiment = createAsyncThunk(
   `createUser-advertisement`,
   async (body: any, thunkAPI) => {
     try {
+      console.log("Creating advertisement with data:", body);
       const { data } = await axiosInstance.post(`${prefix}`, body);
+      console.log("Advertisement created with response:", data);
       return data;
     } catch (error: any) {
+      console.error("Error creating advertisement:", error.response?.data || error);
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
@@ -68,9 +73,12 @@ export const updateAdvertiment = createAsyncThunk(
   `update-advertisement`,
   async (body: any, thunkAPI) => {
     try {
+      console.log("Updating advertisement with data:", body);
       const { data } = await axiosInstance.put(`${prefix}`, body);
+      console.log("Advertisement updated with response:", data);
       return data;
     } catch (error: any) {
+      console.error("Error updating advertisement:", error.response?.data || error);
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }

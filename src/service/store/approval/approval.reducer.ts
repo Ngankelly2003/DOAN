@@ -4,88 +4,123 @@ import {
   EntityId,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import { getApprovals, deleteApproval } from "./approval.api";
+import { getApprovals, deleteApproval, getPendingApprovals, approveRequest } from "./approval.api";
 import { RootState } from "../reducers";
 import { IResponse } from "@/shared/type/IResponse";
 import { IApproval } from "@/model/Approval.model";
 
-interface IInitialAdvertisingFieldState {
+interface IApprovalState {
   loading: boolean;
   AdvertisingField: IApproval | null;
   updateStatusUser: boolean;
   deleteStatus: boolean;
+  approveStatus: boolean;
   errorMessage: string | null;
 }
 
-const initialState: IInitialAdvertisingFieldState = {
+const ApprovalAdapter = createEntityAdapter<IApproval>();
+
+const initialState = ApprovalAdapter.getInitialState<IApprovalState>({
   loading: false,
   errorMessage: null,
   updateStatusUser: false,
   AdvertisingField: null,
   deleteStatus: false,
-};
-
-const ApprovalAdapter = createEntityAdapter({
-  selectId: (Approval: IApproval) => Approval.id ?? ("defaultId" as EntityId),
+  approveStatus: false,
 });
 
 const { actions, reducer } = createSlice({
   name: "approvalSlice",
-  initialState: ApprovalAdapter.getInitialState({ initialState }),
+  initialState,
   reducers: {
     fetching(state) {
-      state.initialState.loading = true;
+      state.loading = true;
     },
-
     resetAll(state) {
-      state.initialState.loading = false;
-      state.initialState.updateStatusUser = false;
-      state.initialState.deleteStatus = false;
-      state.initialState.AdvertisingField = null;
-      state.initialState.errorMessage = null;
+      state.loading = false;
+      state.updateStatusUser = false;
+      state.deleteStatus = false;
+      state.approveStatus = false;
+      state.AdvertisingField = null;
+      state.errorMessage = null;
     },
     resetEntity(state) {
-      state.initialState.updateStatusUser = false;
-      state.initialState.deleteStatus = false;
-      state.initialState.loading = false;
-      state.initialState.errorMessage = null;
+      state.updateStatusUser = false;
+      state.deleteStatus = false;
+      state.approveStatus = false;
+      state.loading = false;
+      state.errorMessage = null;
     },
   },
   extraReducers: (builder) => {
     builder.addCase(
       getApprovals.fulfilled,
       (state, { payload }: PayloadAction<IResponse<IApproval[]>>) => {
-        ApprovalAdapter.setAll(state as any, payload.data);
-        state.initialState.loading = false;
+        ApprovalAdapter.setAll(state, payload.data || []);
+        state.loading = false;
       }
     );
     builder.addCase(
       getApprovals.rejected,
       (state, { payload }: PayloadAction<any>) => {
-        state.initialState.errorMessage =
+        state.errorMessage =
           payload?.message || payload?.error || payload?.msg;
-        state.initialState.loading = false;
+        state.loading = false;
+      }
+    );
+
+    builder.addCase(
+      getPendingApprovals.fulfilled,
+      (state, { payload }: PayloadAction<IResponse<IApproval[]>>) => {
+        ApprovalAdapter.setAll(state, payload.data || []);
+        state.loading = false;
+      }
+    );
+    builder.addCase(
+      getPendingApprovals.rejected,
+      (state, { payload }: PayloadAction<any>) => {
+        state.errorMessage =
+          payload?.message || payload?.error || payload?.msg;
+        state.loading = false;
+      }
+    );
+
+    builder.addCase(
+      approveRequest.fulfilled,
+      (state, { payload }: PayloadAction<any>) => {
+        state.approveStatus = true;
+        state.loading = false;
+      }
+    );
+    builder.addCase(
+      approveRequest.rejected,
+      (state, { payload }: PayloadAction<any>) => {
+        state.errorMessage =
+          payload?.message || payload?.error || payload?.msg;
+        state.loading = false;
+        state.approveStatus = false;
       }
     );
 
     builder.addCase(
       deleteApproval.fulfilled,
       (state, { payload }: PayloadAction<any>) => {
-        state.initialState.deleteStatus = true;
-        state.initialState.loading = false;
+        state.deleteStatus = true;
+        state.loading = false;
       }
     );
     builder.addCase(
       deleteApproval.rejected,
       (state, { payload }: PayloadAction<any>) => {
-        state.initialState.errorMessage =
+        state.errorMessage =
           payload?.message || payload?.error || payload?.msg;
-        state.initialState.loading = false;
-        state.initialState.deleteStatus = false;
+        state.loading = false;
+        state.deleteStatus = false;
       }
     );
   },
 });
+
 export const { fetching, resetAll, resetEntity } = actions;
 export const ApprovalSelectors = ApprovalAdapter.getSelectors<RootState>(
   (state) => state.approval

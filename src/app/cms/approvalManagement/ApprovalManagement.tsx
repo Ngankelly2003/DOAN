@@ -22,8 +22,8 @@ const ApprovalManagement = () => {
   const { approvalStatus } = useSelector(
     (state: RootState) => state.advertiment.initialState
   );
-  const { deleteStatus } = useSelector(
-    (state: RootState) => state.approval.initialState
+  const deleteStatus = useSelector(
+    (state: RootState) => state.approval.deleteStatus
   );
   const fetchApprovals = useCallback(() => {
     dispatch(getApprovals() as any);

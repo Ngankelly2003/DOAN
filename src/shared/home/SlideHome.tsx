@@ -15,9 +15,13 @@ const SlideHome = () => {
     (state: RootState) => state.advertiment.initialState
   );
 
+  console.log("Advertisement Home Data:", advertisementHome);
+
   const bannerApproval = advertisementHome.filter(
     (item: IAdvertisement) => item.advertisementPosition === "center"
   );
+
+  console.log("Banner Approval Data:", bannerApproval);
 
   useEffect(() => {
     dispatch(getAdvertimentHome() as any);
