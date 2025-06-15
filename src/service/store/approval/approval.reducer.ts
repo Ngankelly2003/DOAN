@@ -1,7 +1,6 @@
 import {
   createEntityAdapter,
   createSlice,
-  EntityId,
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { getApprovals, deleteApproval, getPendingApprovals, approveRequest } from "./approval.api";

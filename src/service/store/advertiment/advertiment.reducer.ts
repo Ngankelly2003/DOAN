@@ -19,7 +19,7 @@ import {
 } from "./advertiment.api";
 import { RootState } from "../reducers";
 import { IResponse } from "@/shared/type/IResponse";
-import { IAdvertisement, Status } from "@/model/advertisement.model";
+import { IAdvertisement } from "@/model/advertisement.model";
 
 interface IInitialAdvertisementState {
   loading: boolean;
