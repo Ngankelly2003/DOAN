@@ -108,10 +108,11 @@ const ChatBot = () => {
     setShowSuggestions(false);
     setIsTyping(true);
 
+    const apiUrl = "https://doan-ten.vercel.app/";
     try {
       // Hiệu ứng typing
       setTimeout(async () => {
-        const response = await fetch('/api/chat', {
+        const response = await fetch(`${apiUrl}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: question })
