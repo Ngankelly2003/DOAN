@@ -120,6 +120,7 @@ const AdManagement = () => {
           if (response.data === "successful") {
             setPaymentStatus((prev) => ({ ...prev, [vnp_TxnRef]: "success" }));
             toast.success("Thanh toán thành công!");
+             router.push("/");
           } else {
             setPaymentStatus((prev) => ({ ...prev, [vnp_TxnRef]: "failed" }));
             toast.error("Thanh toán thất bại. Vui lòng thử lại.");
