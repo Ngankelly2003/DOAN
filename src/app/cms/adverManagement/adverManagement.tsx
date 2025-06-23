@@ -195,6 +195,7 @@ const AdManagement = () => {
 
   useEffect(() => {
     localStorage.setItem('transactionRefs', JSON.stringify(transactionRefs));
+    console.log("Transaction references updated:", transactionRefs);
   }, [transactionRefs]);
 
   const columns = [

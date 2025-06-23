@@ -11,6 +11,7 @@ export interface Item {
   isoDate: string;
   link: string;
   pubDate: string;
+  sourceTitle?: string;
 }
 export interface INews {
   id: string | number;

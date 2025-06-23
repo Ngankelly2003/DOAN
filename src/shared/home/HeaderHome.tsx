@@ -67,10 +67,10 @@ const HeaderHome = () => {
             </div>
             <div className="flex items-center gap-3">
               <div>
-                <span className="block leading-4 font-medium text-right	">
+                <span className="block leading-4 font-medium text-center	">
                   TP. Hà Nội
                 </span>
-                <span className="block leading-4">Thứ 2, 12/07/2025</span>
+                <span className="block leading-4">Thứ 3, 24/06/2025</span>
               </div>
               <div className="flex items-center">
                 <FontAwesomeIcon size="2x" icon={faCloud} />

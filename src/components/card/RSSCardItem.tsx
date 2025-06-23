@@ -37,6 +37,8 @@ const CardItem: React.FC<CardItemProps> = ({
   };
 
   return (
+    <>
+    <div className="text-pink-500 text-[13px]">{data?.sourceTitle}</div>
     <Link href={data.link || data.guid} target="_blank">
       <div
         style={{ borderBottom: `${horizontalLines ? "1px solid #eee" : ""}` }}
@@ -88,6 +90,7 @@ const CardItem: React.FC<CardItemProps> = ({
         </div>
       </div>
     </Link>
+    </>
   );
 };
 
